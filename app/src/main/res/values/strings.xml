@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CallBackThread</string>
+    <string name="sum">Sum</string>
+    <string name="sub">Sub</string>
+</resources>
