@@ -43,4 +43,14 @@
         android:tag="Sum"
         android:text="@string/sub" />
 
+    <TextView
+        android:id="@+id/sum_result"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/sub_result"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>

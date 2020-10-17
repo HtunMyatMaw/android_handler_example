@@ -5,7 +5,7 @@ public class CalculatorService {
     /// Sum
     public int calculateSum(int num1, int num2) {
         try {
-            Thread.sleep(5000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

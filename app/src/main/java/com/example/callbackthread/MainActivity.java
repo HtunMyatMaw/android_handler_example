@@ -5,19 +5,27 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import static com.example.callbackthread.CalculatorHandlerThread.SUB_MSG;
 import static com.example.callbackthread.CalculatorHandlerThread.SUM_MSG;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private static final String TAG = "MainActivity";
 
     EditText edtNumOne, edtNumTwo;
     Button btnSum, btnSub;
+    TextView sumResult, subResult;
+    int num1 = 0, num2 = 0;
 
-    CalculatorHandlerThread calculatorHandlerThread = new CalculatorHandlerThread();
+    /// Priority Sum
+    CalculatorHandlerThread calculatorHandlerThreadForSum = new CalculatorHandlerThread();
+    /// Priority Sub
+    CalculatorHandlerThread calculatorHandlerThreadForSub = new CalculatorHandlerThread();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,41 +34,69 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         edtNumOne = findViewById(R.id.num_one);
         edtNumTwo = findViewById(R.id.num_two);
+
+        sumResult = findViewById(R.id.sum_result);
+        subResult = findViewById(R.id.sub_result);
+
         btnSum = findViewById(R.id.btn_sum);
         btnSub = findViewById(R.id.btn_sub);
 
         btnSum.setOnClickListener(this);
         btnSub.setOnClickListener(this);
-        calculatorHandlerThread.start();
+
+        // use it init state
+        calculatorHandlerThreadForSum.start();
+        calculatorHandlerThreadForSub.start();
     }
 
     @Override
     public void onClick(View view) {
+        if (edtNumOne.getText() != null && !edtNumOne.getText().toString().equals("")) {
+            num1 = Integer.parseInt(edtNumOne.getText().toString());
+        }
+        if (edtNumTwo.getText() != null && !edtNumTwo.getText().toString().equals("")) {
+            num2 = Integer.parseInt(edtNumTwo.getText().toString());
+        }
+
         switch (view.getId()) {
             case R.id.btn_sum:
 
                 /// Initialize Callback and Get Callback Data
-                calculatorHandlerThread.listenResultCallBack(data -> {
-                    System.out.println("Action = " + data.mActionType + " , Result =  " + data.mResult);
+                calculatorHandlerThreadForSum.listenResultCallBack(data -> {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.i(TAG, "run: sum " + data.mResult);
+                            int result = data.mResult;
+                            sumResult.setText("SUM VALUE : " + result);
+                        }
+                    });
                 });
-                Message msgSum = Message.obtain(calculatorHandlerThread.getHandler());
+                Message msgSum = Message.obtain(calculatorHandlerThreadForSum.getHandler());
                 msgSum.what = SUM_MSG;
-                msgSum.arg1 = 200;
-                msgSum.arg2 = 100;
+                msgSum.arg1 = num1;
+                msgSum.arg2 = num2;
                 msgSum.sendToTarget();
 
                 break;
             case R.id.btn_sub:
 
                 /// Initialize Callback and Get Callback Data
-                calculatorHandlerThread.listenResultCallBack(data -> {
-                    System.out.println("Action = " + data.mActionType + " , Result =  " + data.mResult);
+                calculatorHandlerThreadForSub.listenResultCallBack(data -> {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.i(TAG, "run: sub " + data.mResult);
+                            int result = data.mResult;
+                            subResult.setText("SUB VALUE : " + result);
+                        }
+                    });
                 });
 
-                Message msgSub = Message.obtain(calculatorHandlerThread.getHandler());
+                Message msgSub = Message.obtain(calculatorHandlerThreadForSub.getHandler());
                 msgSub.what = SUB_MSG;
-                msgSub.arg1 = 200;
-                msgSub.arg2 = 100;
+                msgSub.arg1 = num1;
+                msgSub.arg2 = num2;
                 msgSub.sendToTarget();
 
                 break;
